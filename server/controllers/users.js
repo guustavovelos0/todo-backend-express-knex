@@ -1,16 +1,7 @@
 const _ = require('lodash');
 const users = require('../database/user-queries.js');
 const addErrorReporting = require('../utils/addErrorReporting.js');
-const { z } = require('zod');
-
-// Add user schema
-const userSchema = z.object({
-    name: z.string().min(3).max(50),
-    email: z.string().email(),
-    password: z.string().min(6),
-    role: z.enum(['MANAGER', 'USER', 'OWNER']),
-    organization_id: z.number()
-});
+const userSchema = require('../schemas/user.schema.js');
 
 async function getAllUsers(req, res) {
     const allEntries = await users.all();
@@ -22,21 +13,11 @@ async function getUser(req, res) {
     return res.send(user);
 }
 
-async function createUser(req, res) {
-    const result = userSchema.safeParse(req.body);
-    if (!result.success) {
-        return res.status(400).send({
-            error: "Invalid user data",
-            details: result.error.issues
-        });
-    }
-
-    const created = await users.create(result.data);
-    return res.send(created);
-}
-
 async function updateUser(req, res) {
     const result = userSchema.partial().safeParse(req.body);
+    if (result.data.password) {
+        result.data.password = await bcrypt.hash(result.data.password, 10);
+    }
     if (!result.success) {
         return res.status(400).send({
             error: "Invalid user data",
@@ -62,7 +43,6 @@ async function deleteUser(req, res) {
 const toExport = {
     getAllUsers: { method: getAllUsers, errorMessage: "Could not fetch all users" },
     getUser: { method: getUser, errorMessage: "Could not fetch user" },
-    createUser: { method: createUser, errorMessage: "Could not create user" },
     updateUser: { method: updateUser, errorMessage: "Could not update user" },
     deleteUser: { method: deleteUser, errorMessage: "Could not delete user" }
 }

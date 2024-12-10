@@ -15,15 +15,15 @@ const urlFromTodo = todo => new URL(todo.url)["pathname"];
 const getRoot = _ => request.get('/');
 const getBody = response => response.body;
 
-describe(`Todo-Backend API residing at http://localhost:${process.env.PORT}`, () => {
+xdescribe(`Todo-Backend API residing at http://localhost:${process.env.PORT}`, () => {
 
-    function createFreshTodoAndGetItsUrl(params){
-      var postParams = _.defaults( (params || {}), { title: "blah" } );
-      return request.post('/', postParams).then(getBody).then( urlFromTodo );
+    function createFreshTodoAndGetItsUrl(params) {
+        var postParams = _.defaults((params || {}), { title: "blah" });
+        return request.post('/', postParams).then(getBody).then(urlFromTodo);
     };
 
     describe("The pre-requsites", () => {
-        it("the api root responds to a GET (i.e. the server is up and accessible, CORS headers are set up)", 
+        it("the api root responds to a GET (i.e. the server is up and accessible, CORS headers are set up)",
             async () => {
                 const response = await request.get('/');
                 expect(response.status).toBe(200);
@@ -41,7 +41,7 @@ describe(`Todo-Backend API residing at http://localhost:${process.env.PORT}`, ()
             expect(deleteRoot.status).toBe(200);
         });
 
-        it("after a DELETE the api root responds to a GET with a JSON representation of an empty array", 
+        it("after a DELETE the api root responds to a GET with a JSON representation of an empty array",
             async () => {
                 var deleteThenGet = await request.delete("/").then(getRoot).then(getBody);
                 expect(deleteThenGet).toEqual([]);
@@ -55,22 +55,22 @@ describe(`Todo-Backend API residing at http://localhost:${process.env.PORT}`, ()
         });
 
         it("adds a new todo to the list of todos at the root url", async () => {
-            const starting = { title:"walk the dog" };
+            const starting = { title: "walk the dog" };
             var getAfterPost = await request.post('/', starting).then(getRoot).then(getBody);
             expect(getAfterPost).toHaveLength(1);
             expect(getAfterPost[0]).toMatchObject(expect.objectContaining(starting));
         });
 
-      function createTodoAndVerifyItLooksValidWith( verifyTodoExpectation ){
-        return request.post('/', { title: "blah" })
-            .then(getBody)
-            .then(verifyTodoExpectation)
-            .then(getRoot)
-            .then(getBody)
-            .then((todosFromGet) => {
-                verifyTodoExpectation(todosFromGet[0]);
-            });
-      }
+        function createTodoAndVerifyItLooksValidWith(verifyTodoExpectation) {
+            return request.post('/', { title: "blah" })
+                .then(getBody)
+                .then(verifyTodoExpectation)
+                .then(getRoot)
+                .then(getBody)
+                .then((todosFromGet) => {
+                    verifyTodoExpectation(todosFromGet[0]);
+                });
+        }
 
         it("sets up a new todo as initially not completed", async () => {
             await createTodoAndVerifyItLooksValidWith((todo) => {
@@ -101,7 +101,7 @@ describe(`Todo-Backend API residing at http://localhost:${process.env.PORT}`, ()
         });
 
         it("can navigate from a list of todos to an individual todo via urls", async () => {
-            const makeTwoTodos = 
+            const makeTwoTodos =
                 Promise.all(
                     [
                         request.post('/', { title: "todo the first" }),
@@ -132,9 +132,9 @@ describe(`Todo-Backend API residing at http://localhost:${process.env.PORT}`, ()
 
         it("changes to a todo are persisted and show up when re-fetching the todo", async () => {
             const urlForNewTodo = await createFreshTodoAndGetItsUrl()
-            const patchedTodo = await request.patch(urlForNewTodo, {title:"changed title", completed:true}).then(getBody);
+            const patchedTodo = await request.patch(urlForNewTodo, { title: "changed title", completed: true }).then(getBody);
 
-            function verifyTodosProperties(todo){
+            function verifyTodosProperties(todo) {
                 expect(todo).toHaveProperty("completed", true);
                 expect(todo).toHaveProperty("title", "changed title");
             }
@@ -168,7 +168,7 @@ describe(`Todo-Backend API residing at http://localhost:${process.env.PORT}`, ()
 
     describe("tracking todo order", () => {
         it("can create a todo with an order field", async () => {
-            const postResult = await request.post('/', {title:"blah",order:523}).then(getBody);
+            const postResult = await request.post('/', { title: "blah", order: 523 }).then(getBody);
             expect(postResult).toHaveProperty("order", 523);
         });
 

@@ -3,23 +3,11 @@ const jwt = require('jsonwebtoken');
 const { z } = require('zod');
 const users = require('../database/user-queries.js');
 const addErrorReporting = require('../utils/addErrorReporting.js');
-
-// Validation schemas
-const signupSchema = z.object({
-    name: z.string().min(3).max(50),
-    email: z.string().email(),
-    password: z.string().min(6),
-    organization_id: z.number(),
-    role: z.enum(['MANAGER', 'USER', 'OWNER']).default('USER')
-});
-
-const signinSchema = z.object({
-    email: z.string().email(),
-    password: z.string()
-});
+const userSchema = require('../schemas/user.schema.js');
+const signinSchema = require('../schemas/sign-in.schema.js');
 
 async function signup(req, res) {
-    const result = signupSchema.safeParse(req.body);
+    const result = userSchema.safeParse(req.body);
     if (!result.success) {
         return res.status(400).send({
             error: "Invalid signup data",
