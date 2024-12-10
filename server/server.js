@@ -9,6 +9,7 @@ app.use('/auth', require('./routes/auth.js'));
 
 app.use('/users', authMiddleware, require('./routes/users.js'));
 app.use('/organizations', authMiddleware, require('./routes/organizations.js'));
+app.use('/tasks', authMiddleware, require('./routes/tasks.js'));
 app.use('/projects', [authMiddleware, managerRoleMiddleware], require('./routes/projects.js'));
 
 if (process.env.NODE_ENV !== 'test') {

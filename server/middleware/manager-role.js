@@ -1,4 +1,4 @@
-const ROLES = require('../tests/util/roles.enum');
+const ROLES = require('../utils/roles.enum');
 
 function managerRoleMiddleware(req, res, next) {
     const user = req.user;
