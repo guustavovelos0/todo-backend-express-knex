@@ -1,69 +1,46 @@
-> [!WARNING]
-> I implemented this for an interview once ages ago, but now it's unmaintained.
+# Express Knex Backend Starter
 
-# todo-backend-express-knex
+A robust and modern backend starter kit built with Express.js and Knex.js, featuring comprehensive API documentation with Swagger, authentication, and database migrations.
 
-This is an implementation of [Todo-Backend](http://todobackend.com/) using Node and Express for the server, Knex for database migrations and query building, and some ES6+ features such as async/await. By default, this project configures Knex to save to PostgreSQL.
+## ✨ Features
 
-A [production instance](https://todo-backend-express-knex.herokuapp.com/) is running on Heroku.
+### 🛠 Core Technologies
+- **Express.js** - Fast, unopinionated web framework
+- **Knex.js** - SQL query builder with migrations support
+- **PostgreSQL** - Powerful, open-source relational database
+- **Jest** - Delightful JavaScript Testing Framework
+- **Swagger UI** - Beautiful API documentation
 
-Bonus features include a simple frontend boostrapped with create-react-app and the todo-backend specification tests transcribed for Jest--a quick full-stack starter pack.
+### 🔐 Authentication & Security
+- JWT-based authentication
+- Password hashing with bcrypt
+- Role-based access control
+- Secure HTTP headers
 
-## Installation
+### 📚 Database Features
+- Database migrations with Knex
+- Soft delete support
+- Pagination
+- Relationship handling
+- Query optimization
 
-1. Clone this repository.
+### 🎯 Developer Experience
+- Swagger API documentation
+- Hot reloading with Nodemon
+- Environment configuration
+- Comprehensive test suite
+- Error handling middleware
+- Request validation with Zod
 
-    `git clone git@github.com:tonycheang/todo-backend-express-knex.git`
+## 📖 API Documentation
 
-2. Install dependencies.
+Once the server is running, you can access the Swagger documentation at:
+```http://localhost:5000/api-docs ```
 
-    `yarn install`
+The documentation includes:
+- Detailed endpoint descriptions
+- Request/response schemas
+- Authentication requirements
+- Example requests and responses
+- Error scenarios
 
-3. Create a postgres database for the project.
-
-    ```Bash
-    % psql postgres -U your_username_here
-    postgres=> CREATE DATABASE name_of_db;
-    postgres=> GRANT ALL PRIVILEGES ON DATABASE name_of_db TO your_username_here;
-    postgres=> \q
-    ```
-
-    > You could change the default database, but Knex's .returning() method will only work for PostgreSQL, MSSQL, and Oracle databases. Modifications will be needed for other databases to meet the todo-backend spec.
-
-4. Add Postgres credentials into server/.env to allow Knex to connect to the database.
-5. Install Knex globally.
-
-    `npm install knex -g`
-
-6. Set up the database using Knex migrations.
-
-    `cd server && knex migrate:latest`
-
-7. Start the server on [http://localhost:5000](http://localhost:5000).
-
-    `yarn server`
-
-8. Test it against the spec at [Todo-Backend Specs](http://todobackend.com/specs/index.html?http://localhost:5000/)
-
-## Bonus Features
-
-- Run tests locally using either.
-
-    `yarn test`
-
-    `yarn test:watch`
-
-    >The second command requires watchman  
-    >`brew install watchman`
-
-- Install create-react-app frontend starting at root directory:
-
-    `cd client && yarn install`
-
-- Run backend and frontend simultaneously from root directory.
-
-    `yarn dev`
-
-    > Note: The proxied connection will only work locally.
-    > You'll need the server to serve the frontend build if
-    > you want to host the entire project somewhere.

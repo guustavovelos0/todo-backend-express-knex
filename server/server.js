@@ -1,9 +1,14 @@
 const app = require('./server-config.js');
 
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./swagger");
+
 const authMiddleware = require('./middleware/auth.js');
 const managerRoleMiddleware = require('./middleware/manager-role.js');
 
 const port = process.env.PORT || 5000;
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/auth', require('./routes/auth.js'));
 
