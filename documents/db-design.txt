@@ -1,0 +1,7 @@
+User belong to a Organization.
+Organization has Projects
+Users have Projects
+Projects have Tasks
+Tasks have Subtasks
+Task belongs to a Project
+User has Tasks
