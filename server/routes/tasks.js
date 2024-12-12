@@ -168,6 +168,30 @@ router.post('/', controller.createTask);
 
 /**
  * @swagger
+ * /tasks/subtask:
+ *   post:
+ *     summary: Create a new sub task
+ *     tags: [Tasks]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Task'
+ *     responses:
+ *       200:
+ *         description: The created sub task
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Task'
+ *       400:
+ *         description: Validation error
+ */
+router.post('/subtask', controller.createSubTask);
+
+/**
+ * @swagger
  * /tasks/{id}:
  *   patch:
  *     summary: Update a task

@@ -29,6 +29,15 @@ async function createTask(req, res) {
     return res.send(created);
 }
 
+async function createSubTask(req, res) {
+    const validated = taskSchema.required({ parent_task_id: z.string().uuid() }).parse(req.body);
+    if (!validated) {
+        return res.status(400).send({ error: 'Invalid task data' });
+    }
+    const created = await tasks.create(req.body);
+    return res.send(created);
+}
+
 async function updateTask(req, res) {
     const validated = taskSchema.partial().parse(req.body);
     if (!validated) {
@@ -54,6 +63,7 @@ const toExport = {
     getAllTasksByProject: { method: getAllTasksByProject, errorMessage: "Could not fetch all tasks by project" },
     getTask: { method: getTask, errorMessage: "Could not fetch task" },
     createTask: { method: createTask, errorMessage: "Could not create task" },
+    createSubTask: { method: createSubTask, errorMessage: "Could not create sub task" },
     updateTask: { method: updateTask, errorMessage: "Could not update task" },
     deleteTask: { method: deleteTask, errorMessage: "Could not delete task" }
 }

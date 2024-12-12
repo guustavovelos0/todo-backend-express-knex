@@ -1,5 +1,6 @@
 const ROLES = require('../utils/roles.enum');
 
+// Only allow managers and owners to access this route
 function managerRoleMiddleware(req, res, next) {
     const user = req.user;
 

@@ -15,10 +15,6 @@ const rlsMiddleware = async (req, res, next) => {
 
         // Verify the setting was applied
         const result = await db.raw('SELECT current_setting(\'app.current_tenant\')');
-        console.log('Current tenant set to:', result.rows[0].current_setting);
-
-        // Log the user's organization_id for comparison
-        console.log('User organization_id:', organizationId);
 
         next();
     } catch (error) {

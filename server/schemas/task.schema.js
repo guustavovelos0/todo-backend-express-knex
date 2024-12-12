@@ -8,6 +8,7 @@ const taskSchema = z.object({
     project_id: z.string().uuid(),
     status: z.enum(Object.values(STATUS)).default(STATUS.TODO),
     priority: z.enum(Object.values(PRIORITY)).default(PRIORITY.LOW),
+    parent_task_id: z.string().uuid().optional(),
     due_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format. Use YYYY-MM-DD.")
         .transform((dateStr) => new Date(dateStr))
         .refine((date) => !isNaN(date.getTime()), "Invalid date"),
