@@ -14,15 +14,29 @@ async function getUser(req, res) {
 }
 
 async function updateUser(req, res) {
-    const result = userSchema.partial().safeParse(req.body);
-    if (result.data.password) {
-        result.data.password = await bcrypt.hash(result.data.password, 10);
-    }
+    const result = userSchema.pick({ name: true, password: true }).strict().safeParse(req.body);
     if (!result.success) {
         return res.status(400).send({
             error: "Invalid user data",
             details: result.error.issues
         });
+    }
+
+    if (result.data.password) {
+        result.data.password = await bcrypt.hash(result.data.password, 10);
+    }
+
+    const patched = await users.update(req.params.id, result.data);
+    if (!patched) {
+        return res.status(404).send({ error: "User not found" });
+    }
+    return res.send(patched);
+}
+
+async function updateUserRole(req, res) {
+    const result = userSchema.pick({ role: true }).strict().safeParse(req.body);
+    if (!result.success) {
+        return res.status(400).send({ error: "Invalid user data" });
     }
 
     const patched = await users.update(req.params.id, result.data);
@@ -44,6 +58,7 @@ const toExport = {
     getAllUsers: { method: getAllUsers, errorMessage: "Could not fetch all users" },
     getUser: { method: getUser, errorMessage: "Could not fetch user" },
     updateUser: { method: updateUser, errorMessage: "Could not update user" },
+    updateUserRole: { method: updateUserRole, errorMessage: "Could not update user role" },
     deleteUser: { method: deleteUser, errorMessage: "Could not delete user" }
 }
 

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/users');
+const ownerRoleMiddleware = require('../middleware/owner-role.middleware.js');
 
 /**
  * @swagger
@@ -111,7 +112,7 @@ router.get('/:id', controller.getUser);
  * @swagger
  * /users/{id}:
  *   patch:
- *     summary: Update a user
+ *     summary: Update user fields
  *     tags: [Users]
  *     parameters:
  *       - in: path
@@ -125,7 +126,17 @@ router.get('/:id', controller.getUser);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/User'
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: The new name of the user
+ *               password:
+ *                 type: string
+ *                 description: The new password of the user
+ *             example:
+ *               name: John Smith
+ *               password: newpassword123
  *     responses:
  *       200:
  *         description: The updated user
@@ -139,6 +150,43 @@ router.get('/:id', controller.getUser);
  *         description: Validation error
  */
 router.patch('/:id', controller.updateUser);
+
+
+/**
+ * @swagger
+ * /users/{id}/change-role:
+ *   patch:
+ *     summary: Change user role
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The user ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               role:
+ *                 type: string
+ *                 enum: [user, admin]
+ *                 description: The new role of the user
+ *     responses:
+ *       200:
+ *         description: The updated user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         description: User not found
+ */
+router.patch('/:id/change-role', ownerRoleMiddleware, controller.updateUserRole);
 
 /**
  * @swagger
@@ -163,6 +211,6 @@ router.patch('/:id', controller.updateUser);
  *       404:
  *         description: User not found
  */
-router.delete('/:id', controller.deleteUser);
+router.delete('/:id', ownerRoleMiddleware, controller.deleteUser);
 
 module.exports = router;

@@ -6,7 +6,7 @@ const userSchema = z.object({
     email: z.string().email(),
     password: z.string().min(6),
     role: z.enum(Object.values(ROLES)).default(ROLES.USER),
-    organization_id: z.number()
+    organization_id: z.string().uuid()
 });
 
 module.exports = userSchema;

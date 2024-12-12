@@ -1,16 +1,25 @@
 process.env.NODE_ENV = 'test';
 const request = require('./util/httpRequests.js');
+const jwt = require('jsonwebtoken');
 
 // Mock the database queries
 jest.mock('../database/user-queries', () => ({
     all: jest.fn(),
     get: jest.fn(),
+    getByEmail: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
     delete: jest.fn()
 }));
 
 const userQueries = require('../database/user-queries');
+
+// Mock JWT verification
+jest.mock('jsonwebtoken', () => ({
+    verify: jest.fn((token, secret, callback) => {
+        callback(null, { id: 1, email: 'test@test.com' }); // Mocked payload
+    })
+}));
 
 describe('Users endpoints', () => {
     beforeEach(() => {
@@ -121,5 +130,24 @@ describe('Users endpoints', () => {
         const response = await request.delete('/users/-1');
         expect(response.status).toBe(404);
         expect(userQueries.delete).toHaveBeenCalledWith('-1');
+    });
+
+    // New test case: Get user by email
+    it('should return the user with the given email', async () => {
+        const mockUser = { id: 1, email: 'test@test.com', name: 'Test User' };
+        userQueries.getByEmail.mockResolvedValue([mockUser]);
+
+        const response = await request.get('/users/email/test@test.com');
+        expect(response.status).toBe(200);
+        expect(response.data).toEqual(mockUser);
+        expect(userQueries.getByEmail).toHaveBeenCalledWith('test@test.com');
+    });
+
+    it('should return a 404 if the user email is not found', async () => {
+        userQueries.getByEmail.mockResolvedValue([]);
+
+        const response = await request.get('/users/email/notfound@test.com');
+        expect(response.status).toBe(404);
+        expect(userQueries.getByEmail).toHaveBeenCalledWith('notfound@test.com');
     });
 });

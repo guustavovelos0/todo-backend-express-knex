@@ -17,7 +17,7 @@ async function signup(req, res) {
 
     // Check if user already exists
     const existingUser = await users.getByEmail(result.data.email);
-    if (existingUser) {
+    if (existingUser && existingUser.length > 0) {
         return res.status(409).send({ error: "Email already registered" });
     }
 
