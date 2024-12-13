@@ -46,35 +46,10 @@ const controller = require('../controllers/organizations');
 
 /**
  * @swagger
- * /organizations:
+ * /organizations/current:
  *   get:
- *     summary: Retrieve a list of organizations
+ *     summary: Get the current organization
  *     tags: [Organizations]
- *     responses:
- *       200:
- *         description: A list of organizations
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Organization'
- */
-router.get('/', controller.getAllOrganizations);
-
-/**
- * @swagger
- * /organizations/{id}:
- *   get:
- *     summary: Get an organization by ID
- *     tags: [Organizations]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: The organization ID
  *     responses:
  *       200:
  *         description: The organization data
@@ -85,45 +60,14 @@ router.get('/', controller.getAllOrganizations);
  *       404:
  *         description: Organization not found
  */
-router.get('/:id', controller.getOrganization);
+router.get('/current', controller.getCurrentOrganization);
 
 /**
  * @swagger
- * /organizations:
- *   post:
- *     summary: Create a new organization
- *     tags: [Organizations]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Organization'
- *     responses:
- *       200:
- *         description: The created organization
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Organization'
- *       400:
- *         description: Validation error
- */
-router.post('/', controller.createOrganization);
-
-/**
- * @swagger
- * /organizations/{id}:
+ * /organizations/current:
  *   patch:
- *     summary: Update an organization
+ *     summary: Update current organization
  *     tags: [Organizations]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: The organization ID
  *     requestBody:
  *       required: true
  *       content:
@@ -142,21 +86,14 @@ router.post('/', controller.createOrganization);
  *       400:
  *         description: Validation error
  */
-router.patch('/:id', controller.updateOrganization);
+router.patch('/current', controller.updateCurrentOrganization);
 
 /**
  * @swagger
- * /organizations/{id}:
+ * /organizations/current:
  *   delete:
- *     summary: Delete an organization
+ *     summary: Delete current organization
  *     tags: [Organizations]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: The organization ID
  *     responses:
  *       200:
  *         description: The deleted organization
@@ -167,6 +104,6 @@ router.patch('/:id', controller.updateOrganization);
  *       404:
  *         description: Organization not found
  */
-router.delete('/:id', controller.deleteOrganization);
+router.delete('/current', controller.deleteCurrentOrganization);
 
-module.exports = router; 
+module.exports = router;

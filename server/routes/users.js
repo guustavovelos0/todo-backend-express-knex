@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/users');
 const ownerRoleMiddleware = require('../middleware/owner-role.middleware.js');
+const sameUserRoleMiddleware = require('../middleware/same-user-role.middleware.js');
 
 /**
  * @swagger
@@ -15,7 +16,7 @@ const ownerRoleMiddleware = require('../middleware/owner-role.middleware.js');
  *         - password
  *       properties:
  *         id:
- *           type: integer
+ *           type: string
  *           description: The auto-generated ID of the user
  *         name:
  *           type: string
@@ -32,7 +33,7 @@ const ownerRoleMiddleware = require('../middleware/owner-role.middleware.js');
  *           enum: [user, admin]
  *           description: The role of the user
  *         organization_id:
- *           type: integer
+ *           type: string
  *           description: The ID of the organization the user belongs to
  *         created_at:
  *           type: string
@@ -94,7 +95,7 @@ router.get('/', controller.getAllUsers);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: The user ID
  *     responses:
  *       200:
@@ -119,7 +120,7 @@ router.get('/:id', controller.getUser);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: The user ID
  *     requestBody:
  *       required: true
@@ -149,44 +150,7 @@ router.get('/:id', controller.getUser);
  *       400:
  *         description: Validation error
  */
-router.patch('/:id', controller.updateUser);
-
-
-/**
- * @swagger
- * /users/{id}/change-role:
- *   patch:
- *     summary: Change user role
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: The user ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               role:
- *                 type: string
- *                 enum: [user, admin]
- *                 description: The new role of the user
- *     responses:
- *       200:
- *         description: The updated user
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *       404:
- *         description: User not found
- */
-router.patch('/:id/change-role', ownerRoleMiddleware, controller.updateUserRole);
+router.patch('/:id', sameUserRoleMiddleware, controller.updateUser);
 
 /**
  * @swagger
@@ -199,7 +163,7 @@ router.patch('/:id/change-role', ownerRoleMiddleware, controller.updateUserRole)
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: The user ID
  *     responses:
  *       200:

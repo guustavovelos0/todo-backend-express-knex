@@ -1,37 +1,38 @@
 const organizations = require('../database/organization-queries.js');
 const addErrorReporting = require('../utils/addErrorReporting.js');
+const { z } = require('zod');
 
-async function getAllOrganizations(req, res) {
-    const allEntries = await organizations.all();
-    return res.send(allEntries);
-}
-
-async function getOrganization(req, res) {
-    const org = await organizations.get(req.params.id);
+async function getCurrentOrganization(req, res) {
+    const org = await organizations.get(req.user.organizationId);
     return res.send(org);
 }
 
-async function createOrganization(req, res) {
-    const created = await organizations.create(req.body);
-    return res.send(created);
-}
+async function updateCurrentOrganization(req, res) {
+    const schema = z.object({
+        name: z.string().min(3)
+    });
+    const result = schema.safeParse(req.body);
 
-async function updateOrganization(req, res) {
-    const patched = await organizations.update(req.params.id, req.body);
+    if (!result.success) {
+        return res.status(400).send({
+            error: "Invalid user data",
+            details: result.error.issues
+        });
+    }
+
+    const patched = await organizations.update(req.user.organizationId, result.data);
     return res.send(patched);
 }
 
-async function deleteOrganization(req, res) {
-    const deleted = await organizations.delete(req.params.id);
+async function deleteCurrentOrganization(req, res) {
+    const deleted = await organizations.delete(req.user.organizationId);
     return res.send(deleted);
 }
 
 const toExport = {
-    getAllOrganizations: { method: getAllOrganizations, errorMessage: "Could not fetch all organizations" },
-    getOrganization: { method: getOrganization, errorMessage: "Could not fetch organization" },
-    createOrganization: { method: createOrganization, errorMessage: "Could not create organization" },
-    updateOrganization: { method: updateOrganization, errorMessage: "Could not update organization" },
-    deleteOrganization: { method: deleteOrganization, errorMessage: "Could not delete organization" }
+    getCurrentOrganization: { method: getCurrentOrganization, errorMessage: "Could not fetch organization" },
+    updateCurrentOrganization: { method: updateCurrentOrganization, errorMessage: "Could not update organization" },
+    deleteCurrentOrganization: { method: deleteCurrentOrganization, errorMessage: "Could not delete organization" }
 }
 
 for (let route in toExport) {

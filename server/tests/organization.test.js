@@ -1,112 +1,107 @@
-process.env.NODE_ENV = 'test';
-const request = require('./util/httpRequests.js');
+const { get, patch, del } = require('./util/httpRequests');
 
-// Mock the database queries
+const mockToken = 'Bearer a1ad94e8-3215-4d6f-b0e2-4744a6c33af5';
+
+const mockOrganization = {
+    id: 'a1ad94e8-3215-4d6f-b0e2-4744a6c33af5',
+    name: 'Test Organization'
+};
+
+// Mock the user-queries module
 jest.mock('../database/organization-queries', () => ({
     all: jest.fn(),
     get: jest.fn(),
+    getByEmail: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
     delete: jest.fn()
 }));
 
+jest.mock('jsonwebtoken', () => ({
+    verify: jest.fn((token, secret) => {
+        return {
+            id: 'a1ad94e8-3215-4d6f-b0e2-4744a6c33af5',
+            email: 'test@test.com',
+            organization_id: 'a1ad94e8-3215-4d6f-b0e2-4744a6c33af5',
+            role: 'OWNER'
+        };
+    })
+}));
+
+// Import the mocked module
 const organizationQueries = require('../database/organization-queries');
 
-describe('Organizations endpoints', () => {
-    // Reset all mocks before each test
+describe('GET /organizations/current', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it('should return a list of organizations', async () => {
-        const mockOrgs = [
-            { id: 1, name: 'Org 1', description: 'Desc 1' },
-            { id: 2, name: 'Org 2', description: 'Desc 2' }
-        ];
-        organizationQueries.all.mockResolvedValue(mockOrgs);
+    // Happy Path
+    it('should return current organization', async () => {
+        organizationQueries.get.mockResolvedValue(mockOrganization);
 
-        const response = await request.get('/organizations');
-        expect(response.status).toBe(200);
-        expect(response.data).toEqual(mockOrgs);
-        expect(organizationQueries.all).toHaveBeenCalledTimes(1);
+        const response = await get(`/organizations/current`, { Authorization: `Bearer ${mockToken}` })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(response.body).toEqual(mockOrganization);
+        expect(organizationQueries.get).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('PATCH /organizations/current', () => {
+    const mockToken = 'Bearer a1ad94e8-3215-4d6f-b0e2-4744a6c33af5';
+    const validUpdate = {
+        name: 'Updated Name',
+    };
+
+    beforeEach(() => {
+        jest.clearAllMocks();
     });
 
-    it('should return the organization with the given id', async () => {
-        const mockOrg = { id: 1, name: 'Test Org', description: 'Test Description' };
-        organizationQueries.get.mockResolvedValue(mockOrg);
-
-        const response = await request.get('/organizations/1');
-        expect(response.status).toBe(200);
-        expect(response.data).toEqual(mockOrg);
-        expect(organizationQueries.get).toHaveBeenCalledWith('1');
-    });
-
-    it('should return a 404 if the organization is not found', async () => {
-        organizationQueries.get.mockResolvedValue(null);
-
-        const response = await request.get('/organizations/-1');
-        expect(response.status).toBe(404);
-        expect(organizationQueries.get).toHaveBeenCalledWith('-1');
-    });
-
-    it('should create a new organization', async () => {
-        const newOrg = { name: 'New Org', description: 'New Description' };
-        const createdOrg = { id: 1, ...newOrg };
-        organizationQueries.create.mockResolvedValue(createdOrg);
-
-        const response = await request.post('/organizations', newOrg);
-        expect(response.status).toBe(200);
-        expect(response.data).toEqual(createdOrg);
-        expect(organizationQueries.create).toHaveBeenCalledWith(newOrg);
-    });
-
-    it('should update an organization', async () => {
-        const updateData = { name: 'Updated Org Name' };
-        const updatedOrg = {
-            id: 1,
-            name: 'Updated Org Name',
-            description: 'To Be Updated'
+    // Happy Path
+    it('should update current organization successfully with valid data', async () => {
+        const expectedOrganization = {
+            ...mockOrganization,
+            name: validUpdate.name
         };
-        organizationQueries.update.mockResolvedValue(updatedOrg);
+        organizationQueries.update.mockResolvedValue(expectedOrganization);
 
-        const response = await request.patch('/organizations/1', updateData);
-        expect(response.status).toBe(200);
-        expect(response.data).toEqual(updatedOrg);
-        expect(organizationQueries.update).toHaveBeenCalledWith('1', updateData);
+        const response = await patch(
+            `/organizations/current`,
+            validUpdate,
+            { Authorization: mockToken }
+        )
+            .expect(200);
+
+        expect(response.body).toEqual(expectedOrganization);
+        expect(organizationQueries.update).toHaveBeenCalledTimes(1);
     });
 
-    it('should return a 404 when updating non-existent organization', async () => {
-        organizationQueries.update.mockResolvedValue(null);
-
-        const response = await request.patch('/organizations/-1', {
-            name: 'Updated Name'
-        });
-        expect(response.status).toBe(404);
-        expect(organizationQueries.update).toHaveBeenCalledWith('-1', {
-            name: 'Updated Name'
-        });
-    });
-
-    it('should delete an organization', async () => {
-        const deletedOrg = {
-            id: 1,
-            name: 'Deleted Org',
-            description: 'Deleted',
-            deleted_at: new Date()
+    it('should return 400 when invalid data is provided', async () => {
+        const invalidUpdate = {
+            name: ''
         };
-        organizationQueries.delete.mockResolvedValue(deletedOrg);
 
-        const response = await request.delete('/organizations/1');
-        expect(response.status).toBe(200);
-        expect(response.data).toEqual(deletedOrg);
-        expect(organizationQueries.delete).toHaveBeenCalledWith('1');
+        const response = await patch(
+            `/organizations/current`,
+            invalidUpdate,
+            { Authorization: mockToken }
+        )
+            .expect(400);
+    });
+});
+
+describe('DELETE /organizations/current', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
     });
 
-    it('should return a 404 when deleting non-existent organization', async () => {
-        organizationQueries.delete.mockResolvedValue(null);
+    it('should delete current organization successfully', async () => {
+        organizationQueries.delete.mockResolvedValue(mockOrganization);
 
-        const response = await request.delete('/organizations/-1');
-        expect(response.status).toBe(404);
-        expect(organizationQueries.delete).toHaveBeenCalledWith('-1');
+        const response = await del(`/organizations/current`, { Authorization: mockToken })
+            .expect(200);
     });
-}); 
+});
+
