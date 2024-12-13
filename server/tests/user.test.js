@@ -350,6 +350,9 @@ describe('DELETE /users/:id', () => {
         const userId = mockUsers[0].id;
 
         const response = await del(`/users/${userId}`, { Authorization: mockToken }).expect(404);
+
+        expect(response.body).toEqual({ error: 'User not found' });
+        expect(userQueries.delete).toHaveBeenCalledTimes(1);
     });
 });
 

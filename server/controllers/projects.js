@@ -10,6 +10,9 @@ async function getAllProjects(req, res) {
 async function getProject(req, res) {
 
     const project = await projects.get(req.params.id);
+    if (!project) {
+        return res.status(404).send({ error: "Project not found" });
+    }
     return res.send(project);
 }
 
@@ -26,7 +29,7 @@ async function createProject(req, res) {
 }
 
 async function updateProject(req, res) {
-    const result = projectSchema.partial().safeParse(req.body);
+    const result = projectSchema.pick({ name: true }).strict().safeParse(req.body);
     if (!result.success) {
         return res.status(400).send({
             error: "Invalid project data",
@@ -35,7 +38,7 @@ async function updateProject(req, res) {
     }
     const patched = await projects.update(req.params.id, result.data);
     if (!patched) {
-        return res.status(404).send({ error: "User not found" });
+        return res.status(404).send({ error: "Project not found" });
     }
     return res.send(patched);
 }
@@ -43,7 +46,7 @@ async function updateProject(req, res) {
 async function deleteProject(req, res) {
     const deleted = await projects.delete(req.params.id);
     if (!deleted) {
-        return res.status(404).send({ error: "User not found" });
+        return res.status(404).send({ error: "Project not found" });
     }
     return res.send(deleted);
 }

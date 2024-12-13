@@ -3,7 +3,7 @@ const addErrorReporting = require('../utils/addErrorReporting.js');
 const taskSchema = require('../schemas/task.schema.js');
 
 async function getAllTasks(req, res) {
-    const allEntries = await tasks.getByOrganizationId(req.user.organization_id);
+    const allEntries = await tasks.all();
     return res.send(allEntries);
 }
 
@@ -17,6 +17,9 @@ async function getAllTasksByProject(req, res) {
 
 async function getTask(req, res) {
     const task = await tasks.get(req.params.id);
+    if (!task) {
+        return res.status(404).send({ error: 'Task not found' });
+    }
     return res.send(task);
 }
 

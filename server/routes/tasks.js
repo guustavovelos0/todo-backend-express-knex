@@ -188,7 +188,7 @@ router.post('/', controller.createTask);
  *       400:
  *         description: Validation error
  */
-router.post('/subtask', controller.createSubTask);
+router.post('/:id/subtasks', controller.createSubTask);
 
 /**
  * @swagger

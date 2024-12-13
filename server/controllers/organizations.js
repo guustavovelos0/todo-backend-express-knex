@@ -3,7 +3,8 @@ const addErrorReporting = require('../utils/addErrorReporting.js');
 const { z } = require('zod');
 
 async function getCurrentOrganization(req, res) {
-    const org = await organizations.get(req.user.organizationId);
+    console.log('user', req.user);
+    const org = await organizations.get(req.user.organization_id);
     return res.send(org);
 }
 
@@ -20,12 +21,12 @@ async function updateCurrentOrganization(req, res) {
         });
     }
 
-    const patched = await organizations.update(req.user.organizationId, result.data);
+    const patched = await organizations.update(req.user.organization_id, result.data);
     return res.send(patched);
 }
 
 async function deleteCurrentOrganization(req, res) {
-    const deleted = await organizations.delete(req.user.organizationId);
+    const deleted = await organizations.delete(req.user.organization_id);
     return res.send(deleted);
 }
 
